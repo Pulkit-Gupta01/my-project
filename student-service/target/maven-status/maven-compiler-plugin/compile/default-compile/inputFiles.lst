@@ -1,0 +1,10 @@
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/controller/StudentController.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/config/StudentDBConfig.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/config/StudentPrefDBConfig.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/messaging/MessagePublisher.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/model/jpa/Student.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/StudentServiceApplication.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/repository/jpa/StudentRepository.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/repository/mongo/StudentPreferenceRepository.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/model/mongo/StudentPreference.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/service/StudentService.java
