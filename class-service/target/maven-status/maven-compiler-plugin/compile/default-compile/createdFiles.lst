@@ -1,0 +1,5 @@
+com/example/classservice/model/Class.class
+com/example/classservice/ClassServiceApplication.class
+com/example/classservice/service/ClassService.class
+com/example/classservice/controller/ClassController.class
+com/example/classservice/repository/ClassRepository.class
