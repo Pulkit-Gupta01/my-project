@@ -17,4 +17,4 @@ services:
     image: rabbitmq:management
     ports:
       - "5672:5672"
-      - "15672:15672" # RabbitMQ Management UI
+      - "15672:15672"

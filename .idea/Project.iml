@@ -14,5 +14,13 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-web:6.1.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-mongodb:4.2.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:3.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mapstruct:mapstruct:1.5.5.Final" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:2.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.amqp:spring-rabbit:3.1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.15.4" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.15.4" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.amqp:spring-amqp:3.1.4" level="project" />
   </component>
 </module>

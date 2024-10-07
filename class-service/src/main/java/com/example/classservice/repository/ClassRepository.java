@@ -1,12 +1,15 @@
 package com.example.classservice.repository;
 
-import com.example.classservice.model.Class;
+import com.example.classservice.model.Class; // Ensure this import is correct
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ClassRepository extends MongoRepository<Class, String> {
-//TODO try writing custom JPA query
+    List<Class> findByTeacherId(String teacherId);
+    List<Class> findByTeacherName(String teacherName);
+    Optional<Class> findByName(String name);
 }

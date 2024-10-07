@@ -1,10 +1,11 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://127.0.0.1:27017/classes
+      uri: mongodb://127.0.0.1:27017/classDetailsDB
 
   rabbitmq:
     host: localhost
-    port: 5672
+    port: 5673
     username: guest
     password: guest
+    dynamic: true

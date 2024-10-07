@@ -3,14 +3,30 @@ package com.example.classservice.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "classes") // Specify the collection name in MongoDB
+import java.util.HashSet;
+import java.util.Set;
+
+@Document(collection = "classes")
 public class Class {
 
     @Id
-    private String id; // MongoDB uses String IDs
+    private String id;
+    private String name;
+    private String teacherId;
+    private String teacherName;
+    private Set<String> studentIds; // Assuming you store student IDs in a set
 
-    private String name; // Example field
-    private String teacherId; // Example field
+    public Class() {
+        this.studentIds = new HashSet<>();
+    }
+
+    public Class(String id, String name, String teacherId, String teacherName) {
+        this.id = id;
+        this.name = name;
+        this.teacherId = teacherId;
+        this.teacherName = teacherName;
+        this.studentIds = new HashSet<>();
+    }
 
     // Getters and Setters
     public String getId() {
@@ -35,5 +51,26 @@ public class Class {
 
     public void setTeacherId(String teacherId) {
         this.teacherId = teacherId;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
+    public Set<String> getStudentIds() {
+        return studentIds;
+    }
+
+    public void setStudentIds(Set<String> studentIds) {
+        this.studentIds = studentIds;
+    }
+
+    // Method to add a student ID to the class
+    public void addStudent(String studentId) {
+        this.studentIds.add(studentId);
     }
 }
