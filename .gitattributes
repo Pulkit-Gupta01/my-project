@@ -1,1 +1,2 @@
 *.jar filter=lfs diff=lfs merge=lfs -text
+student-service/target/student-service-1.0-SNAPSHOT.jar filter=lfs diff=lfs merge=lfs -text
