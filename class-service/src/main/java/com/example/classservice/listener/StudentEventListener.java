@@ -1,26 +1,21 @@
 package com.example.classservice.listener;
 
 import com.example.classservice.dto.StudentMessageDTO;
-import com.example.classservice.messaging.MessagePublisher;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StudentEventListener {
 
-    @Autowired
-    private MessagePublisher messagePublisher;
+    private static final Logger logger = LoggerFactory.getLogger(StudentEventListener.class);
 
-    @EventListener
-    public void handleStudentEvent(StudentMessageDTO message) {
-        try {
-            String messageJson = new ObjectMapper().writeValueAsString(message);
-            messagePublisher.sendMessage(messageJson);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace(); // Log the error or handle accordingly
-        }
+    @RabbitListener(queues = "classQueue")
+    public void handleStudentEvent(StudentMessageDTO studentMessage) {
+        // Logic to handle the student message
+        logger.info("Received student message: studentId={}, classId={}",
+                studentMessage.getStudentId(), studentMessage.getClassId());
+        // Further processing logic here
     }
 }

@@ -1,17 +1,17 @@
 package com.example.classservice.service;
 
+import com.example.classservice.config.RabbitConfig; // Use RabbitConfig for CLASS_QUEUE
 import com.example.classservice.dto.ClassDTO;
 import com.example.classservice.mapper.ClassMapper;
 import com.example.classservice.model.Class;
 import com.example.classservice.repository.ClassRepository;
-import com.example.classservice.messaging.MessagePublisher;
 import com.example.classservice.dto.StudentMessageDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.classservice.messaging.MessagePublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.annotation.RabbitListener; // Import RabbitListener
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -31,8 +31,6 @@ public class ClassService {
 
     @Autowired
     private MessagePublisher messagePublisher;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // Method to get all classes
     public List<ClassDTO> getAllClasses() {
@@ -67,27 +65,16 @@ public class ClassService {
     // Method to add a student to a class by class name
     public ClassDTO addStudentToClassByName(String className, String studentId) {
         logger.info("Adding student with ID {} to class {}", studentId, className);
+
+        // Find the class by name
         Class existingClass = classRepository.findByName(className)
                 .orElseThrow(() -> {
                     logger.error("Class not found with name: {}", className);
                     return new NoSuchElementException("Class not found with name: " + className);
                 });
 
+        // Add the student ID to the class
         existingClass.addStudent(studentId); // Ensure this method is implemented in the Class model
-
-        // Prepare the message
-        StudentMessageDTO message = new StudentMessageDTO();
-        message.setStudentId(studentId);
-        message.setClassId(existingClass.getId());
-
-        // Send the message as JSON
-        try {
-            String messageJson = objectMapper.writeValueAsString(message);
-            messagePublisher.sendMessage(messageJson);
-            logger.info("Message sent successfully: {}", messageJson);
-        } catch (JsonProcessingException e) {
-            logger.error("Error processing message for student {}: {}", studentId, e.getMessage());
-        }
 
         // Save the updated class and return the DTO
         Class savedClass = classRepository.save(existingClass);
@@ -144,5 +131,27 @@ public class ClassService {
                     logger.info("Class found: {}", classDTO);
                     return classDTO;
                 });
+    }
+
+    // Listener for receiving messages from the student service
+    @RabbitListener(queues = RabbitConfig.CLASS_QUEUE) // Ensure this matches your configuration
+    public void handleStudentMessage(StudentMessageDTO message) {
+        logger.info("Received student message: {}", message);
+        String studentId = message.getStudentId();
+        String classId = message.getClassId();
+
+        // Find the class by ID and add the student
+        Class existingClass = classRepository.findById(classId)
+                .orElseThrow(() -> {
+                    logger.error("Class not found with ID: {}", classId);
+                    return new NoSuchElementException("Class not found with ID: " + classId);
+                });
+
+        // Add the student to the class
+        existingClass.addStudent(studentId); // Ensure this method is implemented in the Class model
+
+        // Save the updated class
+        Class savedClass = classRepository.save(existingClass);
+        logger.info("Student with ID {} added successfully to class ID {}: {}", studentId, classId, savedClass);
     }
 }

@@ -1,23 +1,32 @@
 package com.example.classservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class StudentMessageDTO {
+
+    @JsonProperty("studentId")
     private String studentId;
+
+    @JsonProperty("classId")
     private String classId;
 
-    // Getters and Setters
-    public String getStudentId() {
-        return studentId;
-    }
+    @JsonProperty("className")
+    private String className;
 
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
-    }
-
-    public String getClassId() {
-        return classId;
-    }
-
-    public void setClassId(String classId) {
-        this.classId = classId;
+    @Override
+    public String toString() {
+        return "StudentMessageDTO{" +
+                "studentId='" + studentId + '\'' +
+                ", classId='" + classId + '\'' +
+                ", className='" + className + '\'' +
+                '}';
     }
 }

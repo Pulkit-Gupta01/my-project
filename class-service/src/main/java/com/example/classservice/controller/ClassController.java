@@ -1,6 +1,7 @@
 package com.example.classservice.controller;
 
 import com.example.classservice.dto.ClassDTO;
+import com.example.classservice.dto.StudentMessageDTO;
 import com.example.classservice.messaging.MessagePublisher;
 import com.example.classservice.service.ClassService;
 import org.slf4j.Logger;
@@ -22,15 +23,10 @@ public class ClassController {
     private ClassService classService;
 
     @Autowired
-    private MessagePublisher messagePublisher;
-
-    //TODO try to use SLF4j logger - done
-    //TODO get All should contain one request body which gives an option to give a filter value, based on which you will return the list
-    //TODO explore pagination, how to return results if asked with pagination
+    private MessagePublisher messagePublisher; // Change to MessagePublisher
 
     @GetMapping
     public ResponseEntity<List<ClassDTO>> getAllClasses() {
-        //TODO add exception handling logics
         logger.info("Fetching all classes");
         try {
             List<ClassDTO> classes = classService.getAllClasses();
@@ -83,8 +79,6 @@ public class ClassController {
 
     @PostMapping
     public ResponseEntity<ClassDTO> createClass(@RequestBody ClassDTO newClassDto) {
-        //TODO add validations in request body
-        //TODO Use DTOs, use mapstruct mapper to map dto to entity - done
         logger.info("Creating a new class: {}", newClassDto.getName());
         try {
             ClassDTO createdClass = classService.createClass(newClassDto);
@@ -100,7 +94,6 @@ public class ClassController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ClassDTO> updateClass(@PathVariable String id, @RequestBody ClassDTO updatedClassDto) {
-        // TODO: add proper exception handling - done
         logger.info("Updating class with ID: {}", id);
         try {
             return classService.updateClass(id, updatedClassDto)
@@ -117,7 +110,6 @@ public class ClassController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClass(@PathVariable String id) {
-        // TODO: add proper exception handling - done
         logger.info("Deleting class with ID: {}", id);
         try {
             classService.deleteClass(id);
@@ -133,18 +125,29 @@ public class ClassController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    // Add a student to a class by class name
+
+
     @PostMapping("/name/{className}/students")
     public ResponseEntity<ClassDTO> addStudentToClassByClassName(@PathVariable String className, @RequestBody String studentId) {
         logger.info("Adding student with ID: {} to class with name: {}", studentId, className);
         try {
-            // Validate studentId here if needed
             if (studentId == null || studentId.isEmpty()) {
                 logger.error("Invalid student ID provided: {}", studentId);
                 return ResponseEntity.badRequest().build();
             }
 
+
             ClassDTO updatedClass = classService.addStudentToClassByName(className, studentId);
+
+
+            StudentMessageDTO studentMessage = new StudentMessageDTO();
+            studentMessage.setStudentId(studentId);
+            studentMessage.setClassName(className);
+
+            // Send a message to RabbitMQ
+            messagePublisher.sendStudentMessage("classQueue", studentMessage);
+            logger.info("Student message sent to RabbitMQ for student ID: {} in class: {}", studentId, className);
+
             return ResponseEntity.ok(updatedClass);
         } catch (NoSuchElementException e) {
             logger.error("Class with name: {} not found, Error: {}", className, e.getMessage());
@@ -155,53 +158,6 @@ public class ClassController {
         } catch (Exception e) {
             logger.error("Error adding student with ID: {} to class with name: {}, Error: {}", studentId, className, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-    @PostMapping("/name/{className}/message")
-    public ResponseEntity<String> sendMessageToClass(@PathVariable String className, @RequestBody String message) {
-        logger.info("Sending message to class with name: {}", className);
-        try {
-            if (message == null || message.isEmpty()) {
-                logger.error("Invalid message provided: {}", message);
-                return ResponseEntity.badRequest().body("Message cannot be empty.");
-            }
-
-            messagePublisher.sendMessageToClassQueue(className, message); // Ensure this method is implemented in MessagePublisher
-            return ResponseEntity.ok("Message sent to class: " + className);
-        } catch (NoSuchElementException e) {
-            logger.error("Class with name: {} not found, Error: {}", className, e.getMessage());
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            logger.error("Error sending message to class: {}, Error: {}", className, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send message.");
-        }
-    }
-    @GetMapping("/name/{className}")
-    public ResponseEntity<ClassDTO> getClassByName(@PathVariable String className) {
-        logger.info("Fetching class with name: {}", className);
-        try {
-            return classService.findClassByName(className)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            logger.error("Error fetching class with name: {}, Error: {}", className, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @PostMapping("/test/message")
-    public ResponseEntity<String> sendTestMessage(@RequestBody String message) {
-        logger.info("Sending test message to RabbitMQ: {}", message);
-        try {
-            if (message == null || message.isEmpty()) {
-                logger.error("Invalid test message provided: {}", message);
-                return ResponseEntity.badRequest().body("Test message cannot be empty.");
-            }
-            messagePublisher.sendMessage(message);
-            return ResponseEntity.ok("Test message sent successfully.");
-        } catch (Exception e) {
-            logger.error("Error sending test message: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send test message.");
         }
     }
 }
