@@ -1,9 +1,11 @@
 package com.example.student.service;
 
+import com.example.student.dto.StudentMessageDTO;
 import com.example.student.model.jpa.Student;
 import com.example.student.model.mongo.StudentPreference;
 import com.example.student.repository.jpa.StudentRepository;
 import com.example.student.repository.mongo.StudentPreferenceRepository;
+import com.example.student.messaging.MessagePublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +24,25 @@ public class StudentService {
     @Autowired
     private StudentPreferenceRepository studentPreferenceRepository;
 
-    public Student createStudent(Student student) {
+    @Autowired
+    private MessagePublisher messagePublisher; // Inject MessagePublisher
+
+    public Student createStudent(Student student, String classId, String className) {
         logger.info("Creating student: {}", student);
         try {
             Student createdStudent = studentRepository.save(student);
             logger.info("Student created: {}", createdStudent);
+
+            // Create a StudentMessageDTO
+            StudentMessageDTO studentMessage = new StudentMessageDTO();
+            studentMessage.setStudentId(String.valueOf(createdStudent.getId())); // Use the ID of the created student
+            studentMessage.setClassId(classId);
+            studentMessage.setClassName(className);
+
+            // Send the message to the class service
+            messagePublisher.sendStudentMessage("classQueue", studentMessage);
+            logger.info("Sent student message to class service: {}", studentMessage);
+
             return createdStudent;
         } catch (Exception e) {
             logger.error("Error creating student: {}, Error: {}", student, e.getMessage());

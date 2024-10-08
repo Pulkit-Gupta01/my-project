@@ -1,10 +1,12 @@
 com/example/student/model/mongo/StudentPreference.class
 com/example/student/service/StudentService.class
 com/example/student/messaging/MessagePublisher.class
-com/example/student/controller/StudentController.class
 com/example/student/config/StudentDBConfig.class
 com/example/student/StudentServiceApplication.class
 com/example/student/config/StudentPrefDBConfig.class
+com/example/student/config/RabbitConfig.class
+com/example/student/controller/StudentController.class
+com/example/student/dto/StudentMessageDTO.class
 com/example/student/model/jpa/Student.class
 com/example/student/repository/mongo/StudentPreferenceRepository.class
 com/example/student/repository/jpa/StudentRepository.class

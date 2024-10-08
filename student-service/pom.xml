@@ -69,6 +69,13 @@
             <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Add dependency on class-service -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>class-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

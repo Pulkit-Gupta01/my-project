@@ -1,5 +1,6 @@
 package com.example.student.controller;
 
+import com.example.student.messaging.MessagePublisher;
 import com.example.student.model.jpa.Student;
 import com.example.student.model.mongo.StudentPreference;
 import com.example.student.service.StudentService;
@@ -21,12 +22,24 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
+    @Autowired
+    private MessagePublisher messagePublisher; // Inject MessagePublisher
+
     @PostMapping
     public ResponseEntity<?> createStudent(@RequestBody Student student) {
         logger.info("Request to create student: {}", student);
         try {
-            Student createdStudent = studentService.createStudent(student);
+
+            String classId = "defaultClassId";
+            String className = "defaultClassName";
+
+            Student createdStudent = studentService.createStudent(student, classId, className);
             logger.info("Student successfully created: {}", createdStudent);
+
+
+            String message = "New student created: ID = " + createdStudent.getId() + ", Name = " + createdStudent.getName();
+            messagePublisher.sendMessage("classQueue", message); // Specify your queue name
+
             return new ResponseEntity<>(createdStudent, HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error("Error creating student: {}", e.getMessage());

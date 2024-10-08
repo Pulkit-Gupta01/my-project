@@ -1,5 +1,7 @@
 /Users/pulkit/Project/student-service/src/main/java/com/example/student/controller/StudentController.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/dto/StudentMessageDTO.java
 /Users/pulkit/Project/student-service/src/main/java/com/example/student/config/StudentDBConfig.java
+/Users/pulkit/Project/student-service/src/main/java/com/example/student/config/RabbitConfig.java
 /Users/pulkit/Project/student-service/src/main/java/com/example/student/config/StudentPrefDBConfig.java
 /Users/pulkit/Project/student-service/src/main/java/com/example/student/messaging/MessagePublisher.java
 /Users/pulkit/Project/student-service/src/main/java/com/example/student/model/jpa/Student.java
