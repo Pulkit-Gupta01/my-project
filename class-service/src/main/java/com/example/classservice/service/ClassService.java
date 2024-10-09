@@ -1,6 +1,6 @@
 package com.example.classservice.service;
 
-import com.example.classservice.config.RabbitConfig; // Use RabbitConfig for CLASS_QUEUE
+import com.example.classservice.config.RabbitConfig;
 import com.example.classservice.dto.ClassDTO;
 import com.example.classservice.mapper.ClassMapper;
 import com.example.classservice.model.Class;
@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.amqp.rabbit.annotation.RabbitListener; // Import RabbitListener
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,7 +32,7 @@ public class ClassService {
     @Autowired
     private MessagePublisher messagePublisher;
 
-    // Method to get all classes
+
     public List<ClassDTO> getAllClasses() {
         logger.info("Fetching all classes");
         List<ClassDTO> classes = classRepository.findAll().stream()
@@ -42,7 +42,7 @@ public class ClassService {
         return classes;
     }
 
-    // Method to get a class by ID
+
     public Optional<ClassDTO> getClassById(String id) {
         logger.info("Fetching class with ID: {}", id);
         return classRepository.findById(id)
@@ -53,7 +53,7 @@ public class ClassService {
                 });
     }
 
-    // Method to create a new class
+
     public ClassDTO createClass(ClassDTO newClassDto) {
         logger.info("Creating new class: {}", newClassDto);
         Class newClassEntity = classMapper.toEntity(newClassDto);
@@ -62,27 +62,19 @@ public class ClassService {
         return classMapper.toDto(createdClassEntity);
     }
 
-    // Method to add a student to a class by class name
-    public ClassDTO addStudentToClassByName(String className, String studentId) {
-        logger.info("Adding student with ID {} to class {}", studentId, className);
 
-        // Find the class by name
-        Class existingClass = classRepository.findByName(className)
-                .orElseThrow(() -> {
-                    logger.error("Class not found with name: {}", className);
-                    return new NoSuchElementException("Class not found with name: " + className);
-                });
+    public Class addStudentToClassByName(String className, String studentId) {
+        Class classEntity = classRepository.findByName(className)
+                .orElseThrow(() -> new NoSuchElementException("Class not found"));
 
-        // Add the student ID to the class
-        existingClass.addStudent(studentId); // Ensure this method is implemented in the Class model
 
-        // Save the updated class and return the DTO
-        Class savedClass = classRepository.save(existingClass);
-        logger.info("Student added successfully to class: {}", savedClass);
-        return classMapper.toDto(savedClass);
+        classEntity.addStudent(studentId);
+
+
+        return classRepository.save(classEntity);
     }
 
-    // Method to update a class
+
     public Optional<ClassDTO> updateClass(String id, ClassDTO updatedClassDto) {
         logger.info("Updating class with ID: {}", id);
         return classRepository.findById(id).map(existingClass -> {
@@ -133,25 +125,46 @@ public class ClassService {
                 });
     }
 
-    // Listener for receiving messages from the student service
-    @RabbitListener(queues = RabbitConfig.CLASS_QUEUE) // Ensure this matches your configuration
+    @RabbitListener(queues = RabbitConfig.CLASS_QUEUE)
     public void handleStudentMessage(StudentMessageDTO message) {
         logger.info("Received student message: {}", message);
+
         String studentId = message.getStudentId();
         String classId = message.getClassId();
 
-        // Find the class by ID and add the student
-        Class existingClass = classRepository.findById(classId)
-                .orElseThrow(() -> {
-                    logger.error("Class not found with ID: {}", classId);
-                    return new NoSuchElementException("Class not found with ID: " + classId);
-                });
+        try {
+            // Fetch the class by ID
+            Class existingClass = classRepository.findById(classId)
+                    .orElseThrow(() -> {
+                        logger.error("Class not found with ID: {}", classId);
+                        return new NoSuchElementException("Class not found with ID: " + classId);
+                    });
 
-        // Add the student to the class
-        existingClass.addStudent(studentId); // Ensure this method is implemented in the Class model
+            if (existingClass.getStudentIds().contains(studentId)) {
+                logger.warn("Student with ID {} is already enrolled in class ID {}", studentId, classId);
+            } else {
 
-        // Save the updated class
-        Class savedClass = classRepository.save(existingClass);
-        logger.info("Student with ID {} added successfully to class ID {}: {}", studentId, classId, savedClass);
+                existingClass.addStudent(studentId);
+
+
+                Class savedClass = classRepository.save(existingClass);
+                logger.info("Student with ID {} added successfully to class ID {}: {}", studentId, classId, savedClass);
+            }
+
+        } catch (NoSuchElementException e) {
+            logger.error("Error adding student to class: {}", e.getMessage(), e);
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while adding student to class: {}", e.getMessage(), e);
+        }
     }
+
+    public String getClassIdByName(String className) {
+        logger.info("Retrieving class ID for class name: {}", className);
+        Class classEntity = classRepository.findByName(className)
+                .orElseThrow(() -> new NoSuchElementException("Class not found"));
+        logger.info("Found class ID: {}", classEntity.getId());
+        return classEntity.getId();
+    }
+
+
 }

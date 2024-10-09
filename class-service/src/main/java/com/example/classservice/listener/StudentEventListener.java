@@ -14,8 +14,12 @@ public class StudentEventListener {
     @RabbitListener(queues = "classQueue")
     public void handleStudentEvent(StudentMessageDTO studentMessage) {
         // Logic to handle the student message
-        logger.info("Received student message: studentId={}, classId={}",
-                studentMessage.getStudentId(), studentMessage.getClassId());
-        // Further processing logic here
+        logger.info("Received student message: studentId={}, classId={}, className={}",
+                studentMessage.getStudentId(), studentMessage.getClassId(), studentMessage.getClassName());
+        try {
+
+        } catch (Exception e) {
+            logger.error("Error processing student message: {}", studentMessage, e);
+        }
     }
 }

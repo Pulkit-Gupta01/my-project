@@ -35,7 +35,7 @@ public class StudentService {
 
             // Create a StudentMessageDTO
             StudentMessageDTO studentMessage = new StudentMessageDTO();
-            studentMessage.setStudentId(String.valueOf(createdStudent.getId())); // Use the ID of the created student
+            studentMessage.setStudentId(String.valueOf(createdStudent.getId()));
             studentMessage.setClassId(classId);
             studentMessage.setClassName(className);
 

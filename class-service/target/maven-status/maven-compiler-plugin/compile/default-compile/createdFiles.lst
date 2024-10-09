@@ -8,5 +8,6 @@ com/example/classservice/messaging/MessagePublisher.class
 com/example/classservice/config/RabbitConfig.class
 com/example/classservice/mapper/ClassMapperImpl.class
 com/example/classservice/service/ClassService.class
+com/example/classservice/messaging/MessageConsumer.class
 com/example/classservice/repository/ClassRepository.class
 com/example/classservice/dto/ClassDTO.class

@@ -17,7 +17,6 @@ public class RabbitConfig {
     public static final String CLASS_QUEUE = "classQueue";
     public static final String STUDENT_QUEUE = "studentQueue";
 
-    // Set up the RabbitTemplate with JSON message converter
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
@@ -26,14 +25,12 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
-    // Declare the queue for class events
     @Bean
     public Queue classQueue() {
         logger.info("Creating classQueue...");
         return new Queue(CLASS_QUEUE, true); // Durable queue
     }
 
-    // Declare the queue for student events (if needed in the future)
     @Bean
     public Queue studentQueue() {
         logger.info("Creating studentQueue...");

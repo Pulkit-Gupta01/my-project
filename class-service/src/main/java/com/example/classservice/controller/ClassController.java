@@ -1,8 +1,10 @@
 package com.example.classservice.controller;
 
+import com.example.classservice.config.RabbitConfig;
 import com.example.classservice.dto.ClassDTO;
 import com.example.classservice.dto.StudentMessageDTO;
 import com.example.classservice.messaging.MessagePublisher;
+import com.example.classservice.model.Class;
 import com.example.classservice.service.ClassService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,28 +127,29 @@ public class ClassController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
     @PostMapping("/name/{className}/students")
-    public ResponseEntity<ClassDTO> addStudentToClassByClassName(@PathVariable String className, @RequestBody String studentId) {
+    public ResponseEntity<Class> addStudentToClassByClassName(@PathVariable String className, @RequestBody String studentId) {
         logger.info("Adding student with ID: {} to class with name: {}", studentId, className);
+
         try {
+
             if (studentId == null || studentId.isEmpty()) {
                 logger.error("Invalid student ID provided: {}", studentId);
                 return ResponseEntity.badRequest().build();
             }
 
 
-            ClassDTO updatedClass = classService.addStudentToClassByName(className, studentId);
+            Class updatedClass = classService.addStudentToClassByName(className, studentId);
 
 
             StudentMessageDTO studentMessage = new StudentMessageDTO();
             studentMessage.setStudentId(studentId);
             studentMessage.setClassName(className);
 
-            // Send a message to RabbitMQ
-            messagePublisher.sendStudentMessage("classQueue", studentMessage);
+
+            messagePublisher.sendStudentMessage(RabbitConfig.CLASS_QUEUE, studentMessage);
             logger.info("Student message sent to RabbitMQ for student ID: {} in class: {}", studentId, className);
+
 
             return ResponseEntity.ok(updatedClass);
         } catch (NoSuchElementException e) {

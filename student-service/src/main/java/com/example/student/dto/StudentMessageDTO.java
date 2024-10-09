@@ -12,22 +12,22 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StudentMessageDTO {
 
-    @JsonProperty("studentId")
+    @JsonProperty("student_id")  // Using snake_case to match JSON structure
     private String studentId;
 
-    @JsonProperty("classId")
+    @JsonProperty("class_id")  // Using snake_case to match JSON structure
     private String classId;
 
-    @JsonProperty("className")
+    @JsonProperty("class_name")  // Using snake_case to match JSON structure
     private String className;
 
     // Override toString for better logging
     @Override
     public String toString() {
         return "StudentMessageDTO{" +
-                "studentId='" + studentId + '\'' +
-                ", classId='" + classId + '\'' +
-                ", className='" + className + '\'' +
+                "student_id='" + studentId + '\'' +
+                ", class_id='" + classId + '\'' +
+                ", class_name='" + className + '\'' +
                 '}';
     }
 }

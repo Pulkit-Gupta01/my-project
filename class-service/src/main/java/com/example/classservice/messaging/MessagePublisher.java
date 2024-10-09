@@ -12,15 +12,15 @@ public class MessagePublisher {
     private static final Logger logger = LoggerFactory.getLogger(MessagePublisher.class);
     private final RabbitTemplate rabbitTemplate;
 
-    // Define CLASS_QUEUE constant
-    public static final String CLASS_QUEUE = "classQueue"; // Update the name as per your queue configuration
+
+    public static final String CLASS_QUEUE = "classQueue";
 
     @Autowired
     public MessagePublisher(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    // Method to send a StudentMessageDTO object as a JSON message
+
     public void sendStudentMessage(String queueName, StudentMessageDTO studentMessage) {
         logger.info("Sending message to queue: {}: {}", queueName, studentMessage);
         rabbitTemplate.convertAndSend(queueName, studentMessage);
